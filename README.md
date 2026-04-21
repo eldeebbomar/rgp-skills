@@ -4,25 +4,34 @@ The **Remote Growth Partners** skill library for Claude Code and Cowork — 13 s
 
 ## What's here
 
+Structured as a Claude Code marketplace containing one plugin — follows the convention used by Anthropic's own [`claude-plugins-official`](https://github.com/anthropics/claude-plugins-public).
+
 ```
 .claude-plugin/
-  plugin.json        ← plugin manifest (points at skills/)
-  marketplace.json   ← in-repo marketplace for direct-from-GitHub install
-skills/
-  README.md                           conventions + Skill Creator usage
-  score-video-screen/SKILL.md         Vetting
-  grade-job-preview-test/SKILL.md
-  interview-notes-summary/SKILL.md
-  candidate-comparison-matrix/SKILL.md
-  candidate-rejection-email/SKILL.md
-  weekly-client-status-drafter/SKILL.md   Client Ops
-  client-intake-to-job-spec/SKILL.md
-  shortlist-deck-builder/SKILL.md
-  role-spec-quality-check/SKILL.md
-  outbound-message-personalizer/SKILL.md  Sourcing
-  linkedin-profile-fit-assessment/SKILL.md
-  sop-authoring-assistant/SKILL.md        Internal
-  meeting-notes-to-actions/SKILL.md
+  marketplace.json                    ← marketplace manifest
+plugins/
+  rgp-skills/
+    .claude-plugin/
+      plugin.json                     ← plugin manifest (points at skills/)
+    skills/
+      README.md                       conventions + Skill Creator usage
+      score-video-screen/SKILL.md         Vetting
+      grade-job-preview-test/SKILL.md
+      interview-notes-summary/SKILL.md
+      candidate-comparison-matrix/SKILL.md
+      candidate-rejection-email/SKILL.md
+      weekly-client-status-drafter/SKILL.md   Client Ops
+      client-intake-to-job-spec/SKILL.md
+      shortlist-deck-builder/SKILL.md
+      role-spec-quality-check/SKILL.md
+      outbound-message-personalizer/SKILL.md  Sourcing
+      linkedin-profile-fit-assessment/SKILL.md
+      sop-authoring-assistant/SKILL.md        Internal
+      meeting-notes-to-actions/SKILL.md
+scripts/
+  sync_from_hub_rgp.py                mirror skills from the private repo
+.github/workflows/
+  sync-from-hub-rgp.yml               daily cron + manual dispatch
 ```
 
 ## Install (RGP team)

@@ -33,8 +33,23 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
 HUB_RGP = "eldeebbomar/hub-rgp"
-FOLDERS_TO_SYNC = ("skills", ".claude-plugin")
-FILES_TO_REMOVE_POST_SYNC = ("skills/_build_migration.py",)
+
+# Map: (source path inside hub-rgp) -> (destination path inside rgp-skills).
+# The destination structure follows the Claude Code marketplace convention
+# (see Anthropic's claude-plugins-official): marketplace.json sits at
+# .claude-plugin/ in the repo root, and each plugin lives in its own
+# directory under plugins/<plugin-name>/ with its own .claude-plugin/
+# plus its payload folders (skills/, agents/, commands/, etc).
+SYNC_MAP = (
+    ("skills", "plugins/rgp-skills/skills"),
+    (".claude-plugin/plugin.json", "plugins/rgp-skills/.claude-plugin/plugin.json"),
+)
+
+# Files from hub-rgp that should NOT land in the public mirror (infra,
+# not content). Paths relative to REPO after the sync.
+FILES_TO_REMOVE_POST_SYNC = (
+    "plugins/rgp-skills/skills/_build_migration.py",
+)
 
 
 def run(cmd: list[str], cwd: Path | None = None, env: dict | None = None) -> None:
@@ -61,16 +76,22 @@ def main() -> int:
             env={**os.environ, "GIT_TERMINAL_PROMPT": "0"},
         )
 
-        for folder in FOLDERS_TO_SYNC:
-            src = tmp_path / folder
-            dst = REPO / folder
+        for src_rel, dst_rel in SYNC_MAP:
+            src = tmp_path / src_rel
+            dst = REPO / dst_rel
             if not src.exists():
-                print(f"WARN: {folder} missing in hub-rgp, skipping", file=sys.stderr)
+                print(f"WARN: {src_rel} missing in hub-rgp, skipping", file=sys.stderr)
                 continue
-            if dst.exists():
-                shutil.rmtree(dst)
-            shutil.copytree(src, dst)
-            print(f"  ← {folder}/ ({sum(1 for _ in dst.rglob('*'))} entries)")
+            if src.is_dir():
+                if dst.exists():
+                    shutil.rmtree(dst)
+                shutil.copytree(src, dst)
+                n = sum(1 for _ in dst.rglob("*"))
+                print(f"  ← {src_rel}/ -> {dst_rel}/ ({n} entries)")
+            else:
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+                print(f"  ← {src_rel} -> {dst_rel}")
 
     for rel in FILES_TO_REMOVE_POST_SYNC:
         target = REPO / rel
@@ -79,7 +100,7 @@ def main() -> int:
             print(f"  - removed {rel} (hub-rgp-only infra)")
 
     print("\nDone. Review with `git status`, then:")
-    print("  git add skills/ .claude-plugin/")
+    print("  git add plugins/ .claude-plugin/")
     print("  git commit -m 'sync: pull latest skills from hub-rgp'")
     print("  git push origin main")
     return 0

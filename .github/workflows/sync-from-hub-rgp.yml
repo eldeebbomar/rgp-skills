@@ -37,7 +37,7 @@ jobs:
           git config user.name "rgp-skills bot"
           git config user.email "rgp-skills-bot@users.noreply.github.com"
           if [[ -n "$(git status --porcelain)" ]]; then
-            git add skills/ .claude-plugin/
+            git add plugins/ .claude-plugin/
             git commit -m "sync: pull latest skills from hub-rgp"
             git push origin main
             echo "Pushed an update."

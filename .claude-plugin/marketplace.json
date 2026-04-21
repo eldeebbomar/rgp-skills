@@ -1,6 +1,17 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "rgp-team",
+  "description": "Remote Growth Partners skill library for Claude Code and Cowork.",
+  "owner": {
+    "name": "Remote Growth Partners",
+    "email": "omar.eldeeb@remotegrowthpartners.com"
+  },
   "plugins": [
-    { "name": "rgp-skills", "path": "./" }
+    {
+      "name": "rgp-skills",
+      "description": "13 starter skills for RGP recruiting + client-ops workflows, authored in SKILL.md format.",
+      "category": "productivity",
+      "source": "./plugins/rgp-skills"
+    }
   ]
 }
