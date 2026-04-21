@@ -2,7 +2,7 @@
 
 This folder holds RGP's AI skills in the **SKILL.md format** used by Anthropic's [Skill Creator plugin](https://claude.com/plugins/skill-creator) and Claude Code skills generally. Each skill is a folder with a `SKILL.md` at the root — YAML frontmatter (`name`, `description`) plus a markdown body.
 
-Canonical source is the private `eldeebbomar/hub-rgp` repo at `skills/<slug>/SKILL.md`. This public repo is a mirror, synced by `scripts/sync_from_hub_rgp.py` (see the root README for the update flow). To edit a skill, edit it in hub-rgp and push; this repo picks up the change on the next sync.
+These are the **source of truth** for the 13 starter skills. The same content lives in Supabase rows (`public.ai_skills.prompt_body` + `description`) so the RGP OS web UI at `/ai/skills` can render them; a migration keeps the two in sync. If you edit a SKILL.md here, update the corresponding `UPDATE` in the sync migration so the next deploy writes the change to the DB.
 
 ## Layout
 
@@ -62,6 +62,19 @@ If you have the Skill Creator plugin installed in Claude Code (`claude plugin in
 
 See the plugin's own [SKILL.md](https://github.com/anthropics/skills/blob/main/skill-creator/SKILL.md) for full workflow docs.
 
-## Installing these skills
+## Syncing to RGP OS
 
-See the [root README](../README.md) for the `/plugin marketplace add` command. Once installed, `/skills list` shows 13 `rgp-skills:<slug>` entries and Claude invokes them automatically when your ask matches a skill's description.
+The DB row for each skill (in `public.ai_skills`) mirrors the SKILL.md content:
+
+- `name` column → SKILL.md frontmatter `name`
+- `description` column → SKILL.md frontmatter `description`
+- `prompt_body` column → everything AFTER the frontmatter (the markdown body)
+
+The sync migration `supabase/migrations/20260421120000_a8000000-aaaa-4aaa-aaaa-000000000001.sql` writes the current bodies into the DB. When you edit a SKILL.md here, update the migration (or write a new one) so a deploy picks it up.
+
+## Why keep both a folder AND DB rows?
+
+- **The folder** is the authoring surface. It's Git-versioned, reviewable in PRs, installable in Claude Code via the plugin.
+- **The DB rows** power the RGP OS UI — the `/ai/skills` library, the "Run in Claude" button, the feedback and XP loops.
+
+Both point at the same content; the folder wins on authoring ergonomics, the DB wins on in-app UX.
