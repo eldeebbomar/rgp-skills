@@ -1,0 +1,46 @@
+name: Sync from hub-rgp
+
+# Mirrors the private eldeebbomar/hub-rgp repo's skills/ + .claude-plugin/
+# into this public repo so the team can /plugin install the latest version.
+#
+# Requires a repository secret named HUB_RGP_READ_TOKEN — a GitHub PAT with
+# read access to eldeebbomar/hub-rgp.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every day at 15:00 UTC (morning in Riyadh, evening in SF).
+    - cron: '0 15 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out rgp-skills
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Sync from hub-rgp
+        env:
+          HUB_RGP_READ_TOKEN: ${{ secrets.HUB_RGP_READ_TOKEN }}
+        run: python scripts/sync_from_hub_rgp.py
+
+      - name: Commit + push if changed
+        run: |
+          git config user.name "rgp-skills bot"
+          git config user.email "rgp-skills-bot@users.noreply.github.com"
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git add skills/ .claude-plugin/
+            git commit -m "sync: pull latest skills from hub-rgp"
+            git push origin main
+            echo "Pushed an update."
+          else
+            echo "No changes — nothing to sync."
+          fi

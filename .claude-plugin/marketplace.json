@@ -1,0 +1,6 @@
+{
+  "name": "rgp-team",
+  "plugins": [
+    { "name": "rgp-skills", "path": "./" }
+  ]
+}
