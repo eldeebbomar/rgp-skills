@@ -1,8 +1,8 @@
 {
   "name": "rgp-skills",
-  "displayName": "RGP Skills",
   "description": "13 starter skills for Remote Growth Partners' recruiting + client-ops workflows. Authored in SKILL.md format (Anthropic Skill Creator plugin conventions). Usable in Claude Code and Cowork.",
-  "version": "1.0.0",
-  "author": "Remote Growth Partners",
-  "skills": "./skills"
+  "author": {
+    "name": "Remote Growth Partners",
+    "email": "omar.eldeeb@remotegrowthpartners.com"
+  }
 }
